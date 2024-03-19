@@ -312,7 +312,13 @@ module Clauneck
       if !pages.empty? && pages != nil
         pages.flat_map do |page|
           if page
-            page['organic_results']&.map { |r| r.dig('cached_page_link') }
+            cached_links = page['organic_results']&.map { |r| r.dig('cached_page_link') }
+            direct_links = page['organic_results']&.map { |r| r.dig('link') }
+            if !cached_links&.compact.empty?
+              cached_links
+            else
+              direct_links&.map {|r| "http://webcache.googleusercontent.com/search?q=cache:#{r}"}
+            end
           else
             puts <<-HELP
             Warning: There's a problem connecting to SerpApi. Make sure you have used the correct API Key.
